@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/email-verify/:id/:hash', function () {
     return view('welcome');
 });

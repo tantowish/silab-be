@@ -53,6 +53,10 @@ class AuthController extends Controller
                 'email' => ['Email atau password salah.'],
             ]);
         }
+
+        if(!$user->email_verified_at){
+            return response()->json(['message'=> "Email belum terferifikasi"]);
+        }
      
         // Response, create token
         return response()->json([
