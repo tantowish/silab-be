@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pendadaran', function (Blueprint $table) {
             $table->id();
-            $table->foreign(['id_students'])->references(['id'])->on('students')->onUpdate('no action')->onDelete('cascade');
-            $table->foreign(['id_lecturers'])->references(['id'])->on('lecturers')->onUpdate('no action')->onDelete('cascade');
+            $table->foreign(['id_student'])->references(['id'])->on('students')->onUpdate('no action')->onDelete('cascade');
+            $table->foreign(['id_lecturer'])->references(['id'])->on('lecturers')->onUpdate('no action')->onDelete('cascade');
             $table->date('tanggal_sidang');
             $table->time('jam');
             $table->string('ruang');
