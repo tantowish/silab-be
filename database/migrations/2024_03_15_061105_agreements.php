@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('agreements', function (Blueprint $table) {
             $table->id();
-            $table->foreign(['id_student'])->references(['id'])->on('students')->onUpdate('no action')->onDelete('cascade');
-            $table->foreign(['id_project'])->references(['id'])->on('projects')->onUpdate('no action')->onDelete('cascade');
+            $table->foreignId('id_student');
+            $table->index('id_student');
+            $table->foreign('id_student')->references('id')->on('students')->onUpdate('no action')->onDelete('cascade');
+            $table->foreignId('id_project');
+            $table->index('id_project');
+            $table->foreign('id_project')->references('id')->on('projects')->onUpdate('no action')->onDelete('cascade');
             $table->enum('agreement_status', ["Revisi", "Proses", "Terplotting Bimbingan"]);
             $table->integer('progress');
             $table->timestamps();

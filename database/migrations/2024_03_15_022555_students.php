@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreign(['id_user'])->references(['id'])->on('users')->onUpdate('no action')->onDelete('cascade');
+            $table->foreignId('id_user');
+            $table->index('id_user');
+            $table->foreign('id_user')->references('id')->on('users')->onUpdate('no action')->onDelete('cascade');
             $table->string('NIM');
             $table->string('semester');
             $table->integer('IPK');
