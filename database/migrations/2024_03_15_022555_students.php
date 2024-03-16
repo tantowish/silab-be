@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreign(['id_user'])->references(['id'])->on('users')->onUpdate('no action')->onDelete('cascade');
             $table->string('NIM');
-            $table->string('year_of_study');
+            $table->string('semester');
             $table->integer('IPK');
             $table->integer('SKS');
             $table->string('phone_number');
