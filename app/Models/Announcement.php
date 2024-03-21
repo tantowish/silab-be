@@ -10,20 +10,24 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class ReserveRule
+ * Class Announcement
  * 
  * @property int $id
- * @property string $rules
+ * @property string $tittle
+ * @property string $detail
+ * @property string $attachment
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  *
  * @package App\Models
  */
-class ReserveRule extends Model
+class Announcement extends Model
 {
-	protected $table = 'reserve_rules';
+	protected $table = 'announcements';
 
 	protected $fillable = [
-		'rules'
+		'tittle',
+		'detail',
+		'attachment'
 	];
 }
