@@ -39,6 +39,7 @@ class AuthController extends Controller
             'token' => $user->createToken('user_login')->plainTextToken
         ], 201);
     }
+    
     public function login(Request $request){
         $request->validate([
             'email' => 'required|email',

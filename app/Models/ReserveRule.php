@@ -24,6 +24,6 @@ class ReserveRule extends Model
 	protected $table = 'reserve_rules';
 
 	protected $fillable = [
-		'rules'
+		'rule'
 	];
 }

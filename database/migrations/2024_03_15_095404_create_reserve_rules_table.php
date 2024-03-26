@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reserve_rules', function (Blueprint $table) {
             $table->id();
-            $table->text('rules');
+            $table->text('rule');
             $table->timestamps();
         });
     }

@@ -36,7 +36,7 @@ class Room extends Model
 	];
 
 	protected $fillable = [
-		'laboratorium_name',
+		'name',
 		'capacity',
 		'type',
 		'description'

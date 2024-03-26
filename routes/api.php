@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function(){
+    return response()->json(["message"=> "Server Running"]);
+});
 
 // Routes tanpa middleware
 Route::post('/login', [AuthController::class, 'login']);
@@ -32,4 +38,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Routes 'auth:sanctum' dan 'verified' middleware
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/current', [AuthController::class, 'current']);
+
+    Route::apiResource('rooms', RoomController::class);
+    Route::apiResource('inventories', InventoryController::class);
+    Route::apiResource('subjects', SubjectController::class);
+    Route::apiResource('rules', SubjectController::class);
 });

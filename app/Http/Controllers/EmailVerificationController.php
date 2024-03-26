@@ -31,8 +31,14 @@ class EmailVerificationController extends Controller
                 'hash' => sha1($request->user()->getEmailForVerification()),
             ]
         );
-    
-        return response()->json(['verification_link' => $verificationUrl, 'message'=>'Link verifikasi sudah terkirim ke email']);
+
+        $urlParts = parse_url($verificationUrl);
+        $pathWithQuery = $urlParts['path'] . '?' . $urlParts['query'];
+        return response()->json([
+            'message'=>'Berhasil melakukan hash auth', 
+            'verification_link' => $verificationUrl, 
+            'verification_path'=>$pathWithQuery,
+        ]);
     }
 
     public function sendVerificationEmail(Request $request){
@@ -42,7 +48,7 @@ class EmailVerificationController extends Controller
         $verificationUrl = $request->link;
 
         // Kirim email verifikasi
-        Mail::to($userEmail)->send(new EmailVerification($verificationUrl));
+        Mail::to($userEmail)->queue(new EmailVerification($verificationUrl));
 
         return response()->json(['message' => 'Email verifikasi telah dikirim.']);
     }
