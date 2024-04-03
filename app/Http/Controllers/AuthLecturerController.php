@@ -2,33 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rule;
+use App\Models\Lecturer;
 
-class AuthController extends Controller
+class AuthLecturerController extends Controller
 {
     public function register(Request $request)
-    {
+    {   
         // Validasi input
         $request->validate(
             [
-                'email' => ['required', 'email', 'ends_with:mail.ugm.ac.id', 'unique:users,email'],
+                // ends_with:ugm.ac.id
+                'email' => ['required', 'email', 'unique:users,email'],
                 'username' => 'required|min:1|max:255',
                 'first_name' => 'required|min:1|max:255',
                 'last_name' => 'required|min:1|max:255',
-                'password' => 'required',
-                'nim' => 'required|min:13|max:13',
-                'faculty' => 'required|min:1|max:255',
-                'department' => 'required|min:1|max:255',
-                'year' => 'required|min:1|max:255',
+                'front_title' => 'min:1|max:255',
+                'back_title' => 'min:1|max:255',
+                'NID' => 'required|min:1|max:255',
+                'phone_number' => 'required|min:1|max:255',
+                'max_quota' => 'required|numeric',
+                'password' => 'required'
             ],
             [
-                'email' => 'Alamat email harus menggunakan domain @mail.ugm.ac.id',
+                'email' => 'Alamat email harus menggunakan domain @ugm.ac.id',
             ]
         );
 
@@ -40,33 +42,37 @@ class AuthController extends Controller
             'username' => $request->username,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'role' => 'umum',
+            'role' => 'dosen',
             'password' => $hashedPassword,
         ]);
 
-        $student = Student::create([
+        $lecturer = Lecturer::create([
             'id_user' => $user->id,
-            'nim' => $request->nim,
-            'faculty' => $request->faculty,
-            'department' => $request->department,
-            'year' => $request->year,
+            'image_profile' => 'default.jpg',
+            'full_name' => $request->first_name . ' ' . $request->last_name,
+            'front_title' => $request->front_title,
+            'back_title' => $request->back_title,
+            'NID' => $request->NID,
+            'phone_number' => $request->phone_number,
+            'max_quota' => $request->max_quota,
+            'isKaprodi' => 0,
         ]);
-
 
         // Response, create token
         return response()->json([
-            'message' => 'Mahasiswa berhasil mendaftar',
+            'message' => 'Dosen berhasil didaftarkan',
             'token' => $user->createToken('user_login')->plainTextToken
         ], 201);
     }
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|ends_with:mail.ugm.ac.id',
+            // ends_with:ugm.ac.id
+            'email' => 'required|email|',
             'password' => 'required',
         ],
         [
-            'email' => 'Alamat email harus menggunakan domain @mail.ugm.ac.id',
+            'email' => 'Alamat email harus menggunakan domain @ugm.ac.id',
         ]);
 
         $user = User::where('email', $request->email)->first();
