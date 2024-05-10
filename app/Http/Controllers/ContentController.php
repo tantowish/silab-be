@@ -11,9 +11,24 @@ class ContentController extends Controller
     public function index()
     {
         // Mengambil semua data konten beserta data project yang terkait
-        $contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-        ->join('projects', 'contents.id_proyek', '=', 'projects.id')
-        ->get();
+        $contents = $contents = Content::select(
+            'contents.*',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+        )
+            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->get();
+
+
 
         // Mengembalikan respons JSON yang berisi semua data konten termasuk data project yang terkait
         return response()->json($contents);
@@ -29,7 +44,11 @@ class ContentController extends Controller
         $get_contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->whereIn('contents.id', $contents)
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
+        
 
 
         // Mengembalikan konten yang telah dipilih beserta data proyek yang terkait dan diurutkan berdasarkan kolom yang dipilih
@@ -43,20 +62,26 @@ class ContentController extends Controller
         $contents = Tag::where('tag', $tags)->pluck('id_content');
         // Mengambil konten berdasarkan ID yang telah dipilih dan diurutkan berdasarkan kolom tanggal
         $sorted_contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-        ->whereIn('contents.id', $contents)
-        ->join('projects', 'contents.id_proyek', '=', 'projects.id')
-        ->orderBy($based, 'asc')->get();
+            ->whereIn('contents.id', $contents)
+            ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
         return response()->json($sorted_contents);
     }
 
-    
+
     public function sortedAllData($based)
     {
         // Mengambil konten berdasarkan ID yang telah dipilih dan diurutkan berdasarkan kolom tanggal
         $sorted_contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-        ->join('projects', 'contents.id_proyek', '=', 'projects.id')
-        ->orderBy($based, 'asc')->get();
+            ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
         return response()->json($sorted_contents);
     }
@@ -80,9 +105,13 @@ class ContentController extends Controller
     public function show($id)
     {
         $content = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-        ->where('contents.id', $id)
-        ->join('projects', 'contents.id_proyek', '=', 'projects.id')
-        ->get();
+            ->where('contents.id', $id)
+            ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->get();
+
         return response()->json($content);
         // return view('content.show');
     }
@@ -106,9 +135,12 @@ class ContentController extends Controller
     {
         $query = $request->input('query');
         $contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-        ->join('projects', 'contents.id_proyek', '=', 'projects.id')
-        ->where('projects.tittle', 'like', "%" . $query . "%")
-        ->get();
+            ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->groupBy('contents.id')
+            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->where('projects.tittle', 'like', "%" . $query . "%")
+            ->get();
         return response()->json($contents);
     }
 }

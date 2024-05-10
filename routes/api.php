@@ -26,8 +26,6 @@ use App\Models\Content;
 // Routes tanpa middleware
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/admin', [AuthAdminController::class, 'login']);
-Route::post('/lecturer', [AuthLecturerController::class, 'login']);
 Route::get('/showcase', [ContentController::class, 'index']);
 Route::get('/showcase/{id}', [ContentController::class, 'show']);
 Route::get('/tag/{id}', [TagController::class, 'show']);
@@ -35,7 +33,7 @@ Route::get('/showcase/topic/{tags}', [ContentController::class, 'showBasedOnTopi
 Route::get('/showcase/sorted/{based}/{tags}', [ContentController::class, 'sortedData']);
 Route::get('/showcase/sorted/{based}', [ContentController::class, 'sortedAllData']);
 Route::get('/search', [ContentController::class, 'search']); 
-
+Route::get('/team', [LecturerController::class, 'index']);
 
 
 

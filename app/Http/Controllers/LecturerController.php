@@ -13,26 +13,14 @@ class LecturerController extends Controller
         return response()->json($lecturers);
         // return view('lecturer.index');
     }
-    public function create()
-    {
-        
-        // return view('lecturer.create');
-    }
-    // public function store(Request $request)
-    // {
-
-    //     return redirect()->route('lecturer.index');
-    // }
+    
     public function show($id)
     {
         $lecturer = Lecturer::find($id);
         return response()->json($lecturer);
         // return view('lecturer.show');
     }
-    public function edit($id)
-    {
-        return view('lecturer.edit');
-    }
+
     public function update(Request $request, $id)
     {
         $lecturer = Lecturer::find($id);
