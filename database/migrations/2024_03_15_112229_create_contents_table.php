@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('contents', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('id_proyek')->index('contents_id_proyek');
+            $table->foreignId('id_proyek')->constrained('projects');
             $table->string('thumbnail_image_url');
             $table->string('content_url')->nullable();
             $table->string('video_url')->nullable();

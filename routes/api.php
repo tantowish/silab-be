@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthAdminController;
 use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\ContentController;
+use App\Http\Controllers\TagController;
+use App\Models\Content;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +28,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/admin', [AuthAdminController::class, 'login']);
 Route::post('/lecturer', [AuthLecturerController::class, 'login']);
+Route::get('/showcase', [ContentController::class, 'index']);
+Route::get('/showcase/{id}', [ContentController::class, 'show']);
+Route::get('/tag/{id}', [TagController::class, 'show']);
+Route::get('/showcase/topic/{tags}', [ContentController::class, 'showBasedOnTopic']);
+Route::get('/showcase/sorted/{based}/{tags}', [ContentController::class, 'sortedData']);
+Route::get('/showcase/sorted/{based}', [ContentController::class, 'sortedAllData']);
+Route::get('/search', [ContentController::class, 'search']); 
+
 
 
 
@@ -56,8 +67,12 @@ Route::middleware(['auth:sanctum', 'role:dosen'])->group(function () {
     });
 });
 
-Route::middleware(['auth:sanctum', 'role:umum'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:mahasiswa'])->group(function () {
     Route::get('/student', function () {
         return response()->json(['message' => 'Student page']);
     });
 });
+
+Route::middleware(['auth:sanctum', 'role:mahasiswa_ta'])->group(function () {
+    Route::post('/add/portofolio', [ContentController::class, 'store']);
+    });

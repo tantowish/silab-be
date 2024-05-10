@@ -18,11 +18,11 @@ class LecturerController extends Controller
         
         // return view('lecturer.create');
     }
-    public function store(Request $request)
-    {
+    // public function store(Request $request)
+    // {
 
-        return redirect()->route('lecturer.index');
-    }
+    //     return redirect()->route('lecturer.index');
+    // }
     public function show($id)
     {
         $lecturer = Lecturer::find($id);

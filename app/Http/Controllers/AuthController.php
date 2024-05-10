@@ -22,7 +22,7 @@ class AuthController extends Controller
                 'first_name' => 'required|min:1|max:255',
                 'last_name' => 'required|min:1|max:255',
                 'password' => 'required',
-                'nim' => 'required|min:13|max:13',
+                'nim' => 'required|min:13|max:15',
                 'faculty' => 'required|min:1|max:255',
                 'department' => 'required|min:1|max:255',
                 'year' => 'required|min:1|max:255',
@@ -46,7 +46,7 @@ class AuthController extends Controller
 
         $student = Student::create([
             'id_user' => $user->id,
-            'nim' => $request->nim,
+            'NIM' => $request->nim,
             'faculty' => $request->faculty,
             'department' => $request->department,
             'year' => $request->year,
@@ -79,7 +79,7 @@ class AuthController extends Controller
         }
 
         if (!$user->email_verified_at) {
-            return response()->json(['message' => "Email belum terferifikasi"]);
+            return response()->json(['message' => "Email belum terverifikasi"]);
         }
 
         // Response, create token
@@ -88,6 +88,7 @@ class AuthController extends Controller
             'token' => $user->createToken('user_login')->plainTextToken
         ]);
     }
+
 
     public function logout(Request $request)
     {

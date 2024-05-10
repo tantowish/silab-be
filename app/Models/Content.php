@@ -9,6 +9,8 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Testing\Fluent\Concerns\Has;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class Content
@@ -33,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Content extends Model
 {
+	use HasFactory;
 	protected $table = 'contents';
 
 	protected $casts = [
@@ -52,6 +55,11 @@ class Content extends Model
 	public function comments()
 	{
 		return $this->hasMany(Comment::class, 'id_content');
+	}
+
+	public function project()
+	{
+		return $this->belongsTo(Project::class, 'id_proyek');
 	}
 
 	public function content_images()
