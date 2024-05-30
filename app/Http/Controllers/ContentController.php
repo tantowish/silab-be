@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Content;
 use Illuminate\Http\Request;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Maize\Markable\Models\Like;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
@@ -194,6 +196,18 @@ class ContentController extends Controller
         $content = Content::where('id', $contentId)->first();
         $content->comment($comment);
     }
-   
+    public function showComments($contentId){
+        // $content = DB::select('SELECT content, user_id FROM comments where commentable_id ='.$contentId);
+        $content = Comment::where('commentable_id', $contentId)->get();
+        return response()->json($content);
+    }
+    public function showCommentsUser(){
+        $id = Auth::user()->id;
+        $content = Content::select('contents.*')
+            ->join('comments', 'contents.id', '=', 'comments.commentable_id')
+            ->where('comments.user_id', $id)
+            ->get();
+        return response()->json($content);
+    }   
 
 }

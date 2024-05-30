@@ -28,24 +28,24 @@ class Comment extends Model
 {
 	protected $table = 'comments';
 
-	protected $casts = [
-		'id_content' => 'int',
-		'id_user' => 'int'
-	];
+	// protected $casts = [
+	// 	'id' => 'int',
+	// 	'user_id' => 'int'
+	// ];
 
-	protected $fillable = [
-		'id_content',
-		'id_user',
-		'comment'
-	];
+	// protected $fillable = [
+	// 	'id_content',
+	// 	'id_user',
+	// 	'comment'
+	// ];
 
 	public function content()
 	{
 		return $this->belongsTo(Content::class, 'id_content');
 	}
 
-	public function user()
-	{
-		return $this->belongsTo(User::class, 'id_user');
-	}
+	// public function user()
+	// {
+	// 	return $this->belongsTo(User::class, 'id_user');
+	// }
 }

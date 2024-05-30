@@ -37,7 +37,7 @@ Route::get('/team', [LecturerController::class, 'index']);
 Route::get('/team/{id}', [LecturerController::class, 'show']);
 Route::get('/team-search', [LecturerController::class, 'search']);
 Route::get('/content/{contentId}/like-count', [ContentController::class, 'countLikes']);
-
+Route::get('/comment/{contentId}', [ContentController::class, 'showComments']);
 
 
 
@@ -64,6 +64,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/content/{contentId}/check-like-status', [ContentController::class, 'checkLike']);
     Route::get('/showLiked', [ContentController::class, 'showLiked']);
     Route::post('/comment/{contentId}', [ContentController::class, 'createComment']);
+    Route::get('/showComments', [ContentController::class, 'showCommentsUser']);
 
 });
 
