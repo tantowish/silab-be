@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Testing\Fluent\Concerns\Has;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Maize\Markable\Markable;
+use Maize\Markable\Models\Like;
+use RyanChandler\Comments\Concerns\HasComments;
 
 /**
  * Class Content
@@ -35,7 +38,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Content extends Model
 {
+	use Markable;
 	use HasFactory;
+	use HasComments;
+
 	protected $table = 'contents';
 
 	protected $casts = [
@@ -52,10 +58,10 @@ class Content extends Model
 		'tipe_konten'
 	];
 
-	public function comments()
-	{
-		return $this->hasMany(Comment::class, 'id_content');
-	}
+	// public function comments()
+	// {
+	// 	return $this->hasMany(Comment::class, 'commentable_id');
+	// }
 
 	public function project()
 	{
@@ -76,4 +82,7 @@ class Content extends Model
 	{
 		return $this->hasMany(Tag::class, 'id_content');
 	}
+	protected static $marks = [
+        Like::class,
+    ];
 }

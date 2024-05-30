@@ -34,6 +34,9 @@ Route::get('/showcase/sorted/{based}/{tags}', [ContentController::class, 'sorted
 Route::get('/showcase/sorted/{based}', [ContentController::class, 'sortedAllData']);
 Route::get('/search', [ContentController::class, 'search']); 
 Route::get('/team', [LecturerController::class, 'index']);
+Route::get('/team/{id}', [LecturerController::class, 'show']);
+Route::get('/team-search', [LecturerController::class, 'search']);
+Route::get('/content/{contentId}/like-count', [ContentController::class, 'countLikes']);
 
 
 
@@ -44,11 +47,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/email/verification-link', [EmailVerificationController::class, 'getVerificationLink']);
     Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
+
 });
 
 // Routes 'auth:sanctum' dan 'verified' middleware
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/current', [AuthController::class, 'current']);
+    ROute::get('/profile', function (Request $request) {
+        return $request->user();
+    });
+    Route::put('/profile/update', [AuthController::class, 'update']);
+    //like
+    Route::post('/content/{contentId}/like', [ContentController::class, 'addLike']);
+    Route::delete('/content/{contentId}/unlike', [ContentController::class, 'unLike']);
+    Route::put('/content/{contentId}/toggle-like', [ContentController::class, 'toggleLike']);
+    Route::get('/content/{contentId}/check-like-status', [ContentController::class, 'checkLike']);
+    Route::get('/showLiked', [ContentController::class, 'showLiked']);
+    Route::post('/comment/{contentId}', [ContentController::class, 'createComment']);
+
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
@@ -73,4 +89,5 @@ Route::middleware(['auth:sanctum', 'role:mahasiswa'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:mahasiswa_ta'])->group(function () {
     Route::post('/add/portofolio', [ContentController::class, 'store']);
+    Route::put('/update/portofolio', [ContentController::class, 'update']);
     });

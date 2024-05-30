@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -21,14 +22,10 @@ class AuthController extends Controller
                 'username' => 'required|min:1|max:255',
                 'first_name' => 'required|min:1|max:255',
                 'last_name' => 'required|min:1|max:255',
-                'password' => 'required',
-                'nim' => 'required|min:13|max:15',
-                'faculty' => 'required|min:1|max:255',
-                'department' => 'required|min:1|max:255',
-                'year' => 'required|min:1|max:255',
+                'password' => 'required'
             ],
             [
-                'email' => 'Alamat email harus menggunakan domain @mail.ugm.ac.id',
+                'email' => 'Email tidak sesuai atau sudah terdaftar sistem',
             ]
         );
 
@@ -40,17 +37,17 @@ class AuthController extends Controller
             'username' => $request->username,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'role' => 'umum',
+            'role' => 'mahasiswa',
             'password' => $hashedPassword,
         ]);
 
-        $student = Student::create([
-            'id_user' => $user->id,
-            'NIM' => $request->nim,
-            'faculty' => $request->faculty,
-            'department' => $request->department,
-            'year' => $request->year,
-        ]);
+        // $student = Student::create([
+        //     'id_user' => $user->id,
+        //     'NIM' => $request->nim,
+        //     'faculty' => $request->faculty,
+        //     'department' => $request->department,
+        //     'year' => $request->year,
+        // ]);
 
 
         // Response, create token
@@ -61,13 +58,15 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|ends_with:mail.ugm.ac.id',
-            'password' => 'required',
-        ],
-        [
-            'email' => 'Alamat email harus menggunakan domain @mail.ugm.ac.id',
-        ]);
+        $request->validate(
+            [
+                'email' => 'required|email|ends_with:mail.ugm.ac.id',
+                'password' => 'required',
+            ],
+            [
+                'email' => 'Alamat email harus menggunakan domain @mail.ugm.ac.id',
+            ]
+        );
 
         $user = User::where('email', $request->email)->first();
 
@@ -100,5 +99,18 @@ class AuthController extends Controller
     public function current(Request $request)
     {
         return response()->json(Auth::user());
+    }
+
+    public function update(ProfileRequest $request)
+    {
+        $user = $request->user();
+        $validatedData = $request->validated();
+        $user->update($validatedData);
+        $user = $user->refresh();
+
+        $success['user'] = $user;
+        $success['success'] = true;
+
+        return response()->json($success, 200);
     }
 }

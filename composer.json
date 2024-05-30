@@ -10,7 +10,10 @@
         "laravel/framework": "^10.10",
         "laravel/jetstream": "^4.3",
         "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.8"
+        "laravel/tinker": "^2.8",
+        "maize-tech/laravel-markable": "^2.2",
+        "overtrue/laravel-follow": "^5.2",
+        "ryangjchandler/laravel-comments": "^0.2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

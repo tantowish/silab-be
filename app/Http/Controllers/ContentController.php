@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use Illuminate\Http\Request;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Auth;
+use Maize\Markable\Models\Like;
+use App\Models\User;
 
 class ContentController extends Controller
 {
@@ -115,12 +118,19 @@ class ContentController extends Controller
         return response()->json($content);
         // return view('content.show');
     }
-    public function edit($id)
+    
+    public function update(Request $request)
     {
-        return view('content.edit');
-    }
-    public function update(Request $request, $id)
-    {
+        $request->validate([
+            'id_proyek' => 'required',
+            'thumbnail_image_url' => 'required',
+            'content_url' => 'required',
+            'video_url' => 'required',
+            'video_tittle' => 'required',
+            'github_url' => 'required',
+            'tipe_konten' => 'required',
+        ]);
+        $id = $request->id_proyek;
         $content = Content::find($id);
         $content->update($request->all());
         return response()->json("Content berhasil di-update");
@@ -143,4 +153,47 @@ class ContentController extends Controller
             ->get();
         return response()->json($contents);
     }
+
+    public function addLike($contentId){
+        $content = Content::where('id', $contentId)->first();  
+        $id = Auth::user()->id;
+        $user = User::find($id);     
+        Like::add($content, $user); // marks the course liked for the given user
+    }
+
+    public function unLike($contentId){
+        $content = Content::where('id', $contentId)->first();
+        $id = Auth::user()->id;
+        $user = User::find($id);        
+        Like::remove($content, $user); // marks the course liked for the given user
+    }
+    public function toggleLike($contentId){
+        $content = Content::where('id', $contentId)->first();
+        $id = Auth::user()->id;
+        $user = User::find($id);        
+        Like::toggle($content, $user); // marks the course liked for the given user
+    }
+    public function checkLike($contentId){
+        $content = Content::where('id', $contentId)->first();
+        $id = Auth::user()->id;
+        $user = User::find($id);        
+        $isLiked = Like::has($content, $user); // marks the course liked for the given user
+        return response()->json($isLiked);
+    }   
+    public function countLikes($contentId){
+        $content = Content::where('id', $contentId)->first();
+        $count = Like::count($content); // marks the course liked for the given post 
+        return response()->json($count);
+    }
+    public function showLiked(){
+        $likedContents = Content::firstOrFail()->likes;
+        return response()->json($likedContents);
+    }
+    public function createComment($contentId, Request $request){
+        $comment = $request->comment;
+        $content = Content::where('id', $contentId)->first();
+        $content->comment($comment);
+    }
+   
+
 }
