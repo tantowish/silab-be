@@ -10,6 +10,10 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\TagController;
 use App\Models\Content;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\CodeCheckController;
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ResetCodePassword;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +42,9 @@ Route::get('/team/{id}', [LecturerController::class, 'show']);
 Route::get('/team-search', [LecturerController::class, 'search']);
 Route::get('/content/{contentId}/like-count', [ContentController::class, 'countLikes']);
 Route::get('/comment/{contentId}', [ContentController::class, 'showComments']);
-
+Route::post('/password/email',  ForgotPasswordController::class);
+Route::post('/password/code/check', CodeCheckController::class);
+Route::post('/password/reset', ResetPasswordController::class);
 
 
 // Routes 'auth:sanctum' middleware

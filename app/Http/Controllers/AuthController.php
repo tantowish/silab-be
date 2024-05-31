@@ -113,4 +113,5 @@ class AuthController extends Controller
 
         return response()->json($success, 200);
     }
+    
 }
