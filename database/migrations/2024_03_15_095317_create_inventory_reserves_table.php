@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('inventory_id');
             $table->foreign('inventory_id')->references('id')->on('inventories');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('end_time')->nullable();
             $table->string('identity', 100);
             $table->string('email', 255);
             $table->boolean('is_approved')->default(false);
