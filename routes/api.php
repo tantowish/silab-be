@@ -44,7 +44,7 @@ Route::get('/content/{contentId}/like-count', [ContentController::class, 'countL
 Route::get('/comment/{contentId}', [ContentController::class, 'showComments']);
 Route::post('/password/email',  ForgotPasswordController::class);
 Route::post('/password/code/check', CodeCheckController::class);
-Route::post('/password/reset', ResetPasswordController::class);
+Route::post('/password-reset', ResetPasswordController::class);
 
 
 // Routes 'auth:sanctum' middleware

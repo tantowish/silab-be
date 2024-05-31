@@ -22,4 +22,12 @@ class CodeCheckController extends Controller
 
         return $this->jsonResponse(['code' => $passwordReset->code], trans('passwords.code_is_valid'), 200);
     }
+
+    public function jsonResponse($data, $message, $status)
+    {
+        return response()->json([
+            'data' => $data,
+            'message' => $message,
+        ], $status);
+    }
 }

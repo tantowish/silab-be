@@ -5,7 +5,7 @@ use App\Models\ResetCodePassword;
 use Illuminate\Foundation\Auth\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ResetPasswordRequest;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -23,8 +23,9 @@ class ResetPasswordController extends Controller
             'code' => 'required|exists:reset_code_passwords,code',
             'password' => 'required|min:6|confirmed',
         ]);
-        $passwordReset = ResetCodePassword::firstWhere('code', $request->code);
 
+        $passwordReset = ResetCodePassword::firstWhere('code', $request->code);
+        
         if ($passwordReset->isExpire()) {
             return $this->jsonResponse(null, trans('passwords.code_is_expire'), 422);
         }
@@ -36,5 +37,13 @@ class ResetPasswordController extends Controller
         $passwordReset->delete();
 
         return $this->jsonResponse(null, trans('site.password_has_been_successfully_reset'), 200);
+    }
+
+    public function jsonResponse($data, $message, $status)
+    {
+        return response()->json([
+            'data' => $data,
+            'message' => $message,
+        ], $status);
     }
 }

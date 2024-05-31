@@ -53,7 +53,7 @@ class ContentController extends Controller
             ->groupBy('contents.id')
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
-        
+
 
 
         // Mengembalikan konten yang telah dipilih beserta data proyek yang terkait dan diurutkan berdasarkan kolom yang dipilih
@@ -120,7 +120,7 @@ class ContentController extends Controller
         return response()->json($content);
         // return view('content.show');
     }
-    
+
     public function update(Request $request)
     {
         $request->validate([
@@ -146,68 +146,102 @@ class ContentController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
+
+        $contents = Content::select(
+            'contents.id',
+            'contents.id_proyek',
+            'contents.created_at',
+            'contents.updated_at',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+            DB::raw('JSON_ARRAYAGG(tags.tag) as tags')
+        )
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
-            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->where('projects.tittle', 'like', "%" . $query . "%")
+            ->groupBy(
+                'contents.id',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
             ->get();
+
         return response()->json($contents);
     }
 
-    public function addLike($contentId){
-        $content = Content::where('id', $contentId)->first();  
+
+    public function addLike($contentId)
+    {
+        $content = Content::where('id', $contentId)->first();
         $id = Auth::user()->id;
-        $user = User::find($id);     
+        $user = User::find($id);
         Like::add($content, $user); // marks the course liked for the given user
     }
 
-    public function unLike($contentId){
+    public function unLike($contentId)
+    {
         $content = Content::where('id', $contentId)->first();
         $id = Auth::user()->id;
-        $user = User::find($id);        
+        $user = User::find($id);
         Like::remove($content, $user); // marks the course liked for the given user
     }
-    public function toggleLike($contentId){
+    public function toggleLike($contentId)
+    {
         $content = Content::where('id', $contentId)->first();
         $id = Auth::user()->id;
-        $user = User::find($id);        
+        $user = User::find($id);
         Like::toggle($content, $user); // marks the course liked for the given user
     }
-    public function checkLike($contentId){
+    public function checkLike($contentId)
+    {
         $content = Content::where('id', $contentId)->first();
         $id = Auth::user()->id;
-        $user = User::find($id);        
+        $user = User::find($id);
         $isLiked = Like::has($content, $user); // marks the course liked for the given user
         return response()->json($isLiked);
-    }   
-    public function countLikes($contentId){
+    }
+    public function countLikes($contentId)
+    {
         $content = Content::where('id', $contentId)->first();
         $count = Like::count($content); // marks the course liked for the given post 
         return response()->json($count);
     }
-    public function showLiked(){
+    public function showLiked()
+    {
         $likedContents = Content::firstOrFail()->likes;
         return response()->json($likedContents);
     }
-    public function createComment($contentId, Request $request){
+    public function createComment($contentId, Request $request)
+    {
         $comment = $request->comment;
         $content = Content::where('id', $contentId)->first();
         $content->comment($comment);
     }
-    public function showComments($contentId){
+    public function showComments($contentId)
+    {
         // $content = DB::select('SELECT content, user_id FROM comments where commentable_id ='.$contentId);
         $content = Comment::where('commentable_id', $contentId)->get();
         return response()->json($content);
     }
-    public function showCommentsUser(){
+    public function showCommentsUser()
+    {
         $id = Auth::user()->id;
         $content = Content::select('contents.*')
             ->join('comments', 'contents.id', '=', 'comments.commentable_id')
             ->where('comments.user_id', $id)
             ->get();
         return response()->json($content);
-    }   
-
+    }
 }
