@@ -13,31 +13,83 @@ use Illuminate\Support\Facades\DB;
 
 class ContentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil semua data konten beserta data project yang terkait
-        $contents = $contents = Content::select(
-            'contents.*',
-            'projects.id as project_id',
-            'projects.id_lecturer',
-            'projects.id_period',
-            'projects.tittle',
-            'projects.agency',
-            'projects.description',
-            'projects.tools',
-            'projects.status',
-        )
-            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
-            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
-            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
-            ->get();
+        if ($request['category'] == 'all') {
+            $contents = Content::select(
+                'contents.*',
+                'users.first_name',
+                'users.last_name',
+                'projects.id as project_id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status',
+            )
+                ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+                ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+                ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+                ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+                ->leftJoin('users', 'users.id', '=', 'students.id_user')
+                ->groupBy(
+                    'contents.id',
+                    'projects.id',
+                    'users.id',
+                    'projects.id_lecturer',
+                    'projects.id_period',
+                    'projects.tittle',
+                    'projects.agency',
+                    'projects.description',
+                    'projects.tools',
+                    'projects.status'
+                )
+                ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+                ->paginate(9);
+        } else {
+            $tags = $request['category'];
+            $category = Tag::where('tag', $tags)->pluck('id_content');
+            
+            $contents = Content::select(
+                'contents.*',
+                'users.first_name',
+                'users.last_name',
+                'projects.id as project_id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status',
+            )
+                ->whereIn('contents.id', $category)
+                ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+                ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+                ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+                ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+                ->leftJoin('users', 'users.id', '=', 'students.id_user')
+                ->groupBy(
+                    'contents.id',
+                    'projects.id',
+                    'users.id',
+                    'projects.id_lecturer',
+                    'projects.id_period',
+                    'projects.tittle',
+                    'projects.agency',
+                    'projects.description',
+                    'projects.tools',
+                    'projects.status'
+                )
+                ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+                ->paginate(9);
+        }
 
-
-
-        // Mengembalikan respons JSON yang berisi semua data konten termasuk data project yang terkait
         return response()->json($contents);
     }
+
 
 
     public function showBasedOnTopic($tags)
@@ -109,17 +161,87 @@ class ContentController extends Controller
 
     public function show($id)
     {
-        $content = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
-            ->where('contents.id', $id)
-            ->join('projects', 'contents.id_proyek', '=', 'projects.id')
+        $content = Content::select(
+            'contents.*',
+            'users.first_name',
+            'users.last_name',
+            'lecturers.full_name as lecturer',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+        )
+            ->where('contents.id', '=', $id)
+            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
-            ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
+            ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+            ->leftJoin('lecturers', 'lecturers.id', '=', 'bimbingan.id_lecturer')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->groupBy(
+                'contents.id',
+                'projects.id',
+                'users.id',
+                'lecturers.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
+            ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
             ->get();
 
         return response()->json($content);
         // return view('content.show');
     }
+
+    public function self($id)
+    {
+        $content = Content::select(
+            'contents.*',
+            'users.first_name',
+            'users.last_name',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+        )
+            ->where('users.id', '=', $id)
+            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->groupBy(
+                'contents.id',
+                'projects.id',
+                'users.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
+            ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+            ->get();
+
+        return response()->json($content);
+        // return view('content.show');
+    }
+
 
     public function update(Request $request)
     {
@@ -220,7 +342,11 @@ class ContentController extends Controller
     }
     public function showLiked()
     {
-        $likedContents = Content::firstOrFail()->likes;
+        $likedContents = Content::select('contents.*')
+            ->join('markable_likes', 'contents.id', '=', 'markable_likes.markable_id')
+            ->where('markable_likes.user_id', Auth::user()->id)
+            ->get();
+
         return response()->json($likedContents);
     }
     public function createComment($contentId, Request $request)

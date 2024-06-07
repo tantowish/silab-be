@@ -32,6 +32,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/showcase', [ContentController::class, 'index']);
 Route::get('/showcase/{id}', [ContentController::class, 'show']);
+Route::get('/self/{id}', [ContentController::class, 'self']);
 Route::get('/tag/{id}', [TagController::class, 'show']);
 Route::get('/showcase/topic/{tags}', [ContentController::class, 'showBasedOnTopic']);
 Route::get('/showcase/sorted/{based}/{tags}', [ContentController::class, 'sortedData']);

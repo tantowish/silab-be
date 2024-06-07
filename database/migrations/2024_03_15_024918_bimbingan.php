@@ -19,6 +19,9 @@ return new class extends Migration
             $table->foreignId('id_lecturer');
             $table->index('id_lecturer');
             $table->foreign('id_lecturer')->references('id')->on('lecturers')->onUpdate('no action')->onDelete('cascade');
+            $table->foreignId('id_project');
+            $table->index('id_project');
+            $table->foreign('id_project')->references('id')->on('projects')->onUpdate('no action')->onDelete('cascade');
             $table->string('ke');
             $table->date('tanggal');
             $table->string('subjek');
