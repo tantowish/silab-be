@@ -54,4 +54,8 @@ class RoomReserf extends Model
 	{
 		return $this->belongsTo(Room::class);
 	}
+
+	public function schedule(){
+        return $this->hasMany(Schedule::class, 'room_id');
+    }
 }

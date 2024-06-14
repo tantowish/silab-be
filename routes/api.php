@@ -1,8 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReserveRuleController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SubjectController;
 use Illuminate\Http\Request;
@@ -36,11 +41,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 // Routes 'auth:sanctum' dan 'verified' middleware
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
     Route::get('/current', [AuthController::class, 'current']);
 
     Route::apiResource('rooms', RoomController::class);
     Route::apiResource('inventories', InventoryController::class);
     Route::apiResource('subjects', SubjectController::class);
-    Route::apiResource('rules', SubjectController::class);
+    Route::apiResource('rules', ReserveRuleController::class);
+
+    // Dashboard route
+    Route::get('dashboard/countLab', [DashboardController::class, 'countLab'])->name('dashboard.count-lab');
+    Route::get('dashboard/countInventory', [DashboardController::class, 'countInvent'])->name('dashboard.count-inventory');
+    Route::get('dashboard/schedules', [DashboardController::class, 'getSchedule'])->name('dashboard.schedules');
+    Route::get('dashboard/labReserve', [DashboardController::class, 'getLabReserve'])->name('dashboard.labReserve');
+    Route::get('dashboard/inventoryReserve', [DashboardController::class, 'getInventoryReserve'])->name('dashboard.inventoryReserve');
+
+    // Schedule route
+    Route::get('schedules', [JadwalController::class, 'getSchedule'])->name('schedule');
+    Route::get('schedules/{id}', [JadwalController::class, 'getSchedulelDetail'])->name('schedule.detail');
+
+    // Reserve route
+    Route::get('reserve/laboratorium', [PeminjamanController::class, 'getLabReserve'])->name('reserve.laboratorium');
+    Route::patch('reserve/laboratorium/{id}', [PeminjamanController::class, 'changeStatusRoom'])->name('reserve.lab.update');
+    Route::get('reserve/inventory', [PeminjamanController::class, 'getInventoryReserve'])->name('reserve.inventory');
+    Route::patch('reserve/inventory/{id}', [PeminjamanController::class, 'changeStatusInventory'])->name('reserve.invent.update');
+    
+    // Profile route
+    Route::get('users', [ProfileController::class, 'getProfile'])->name('users.profile');
+    Route::patch('users', [ProfileController::class, 'update'])->name('users.update');
 });

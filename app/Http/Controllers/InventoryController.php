@@ -20,7 +20,19 @@ class InventoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'no_item' => 'required|string|max:255',
+            'condition' => 'required',
+            'information' => 'required',
+        ]);
+    
+        $rule = Inventory::create($validatedData);   
+
+        return response()->json([
+            "message"=> "Berhasil membuat rule",
+            "data"=> $rule
+        ], 201);
     }
 
     /**
@@ -28,7 +40,7 @@ class InventoryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return response()->json(["data" => Inventory::findOrFail($id)->with('rooms')->get()]);
     }
 
     /**
@@ -36,7 +48,24 @@ class InventoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validatedData = $request->validate([
+            'item_name' => 'required|string|max:255',
+            'no_item' => 'required|string|max:255',
+            'condition' => 'required',
+            'information' => 'required',
+        ]);
+
+        $inventory = Inventory::find($id);
+        if(!$inventory){
+            return response()->json(["message"=> "Inventory tidak ditemukan"]);
+        }
+
+        $inventory->update($validatedData);
+
+        return response()->json([
+            "message"=> "Berhasil mengupdate inventory",
+            "data"=>$inventory
+        ]);
     }
 
     /**
@@ -44,6 +73,15 @@ class InventoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $inventory = Inventory::find($id);
+        if(!$inventory){
+            return response()->json(["message"=> "Inventory tidak ditemukan"]);
+        }
+
+        $inventory->delete();
+        return response()->json([
+            "message"=> "Berhasil menghapus inventory",
+            "data"=>$inventory
+        ]);
     }
 }
