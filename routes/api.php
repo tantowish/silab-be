@@ -12,6 +12,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\umum\InventoryReserfController;
 use App\Http\Controllers\umum\LaboratoriumController;
+use App\Http\Controllers\umum\LandingpageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -85,4 +86,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('inventory', [InventoryReserfController::class, 'index'])->name('inventory');
     Route::get('inventory/reserve', [InventoryReserfController::class, 'getReserve'])->name('inventory.reserves');
     Route::post('inventory/reserve', [InventoryReserfController::class, 'inventoryReserve'])->name('inventory.reserve');
+
+    // Landing page
+    Route::get('landingpage', [LandingpageController::class, 'index'])->name('landingpage');
 });
