@@ -10,6 +10,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReserveRuleController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\umum\InventoryReserfController;
+use App\Http\Controllers\umum\LaboratoriumController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -58,15 +60,29 @@ Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
 
     // Schedule route
     Route::get('schedules', [JadwalController::class, 'getSchedule'])->name('schedule');
-    Route::get('schedules/{id}', [JadwalController::class, 'getSchedulelDetail'])->name('schedule.detail');
+    Route::get('schedules/{id}', [JadwalController::class, 'getScheduleByRoom'])->name('schedule.detail');
 
     // Reserve route
     Route::get('reserve/laboratorium', [PeminjamanController::class, 'getLabReserve'])->name('reserve.laboratorium');
     Route::patch('reserve/laboratorium/{id}', [PeminjamanController::class, 'changeStatusRoom'])->name('reserve.lab.update');
     Route::get('reserve/inventory', [PeminjamanController::class, 'getInventoryReserve'])->name('reserve.inventory');
     Route::patch('reserve/inventory/{id}', [PeminjamanController::class, 'changeStatusInventory'])->name('reserve.invent.update');
-    
+});
+
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Profile route
     Route::get('users', [ProfileController::class, 'getProfile'])->name('users.profile');
     Route::patch('users', [ProfileController::class, 'update'])->name('users.update');
+    
+    // Laboratorium route
+    Route::get('laboratorium', [LaboratoriumController::class, 'index'])->name('laboratorium');
+    Route::get('laboratorium/{id}', [LaboratoriumController::class, 'detail'])->name('laboratorium.detail');
+    Route::get('laboratorium/schedule/{id}', [LaboratoriumController::class, 'getScheduleByRoom'])->name('laboratorium.schedule');
+    Route::get('laboratorium/{id}/reserve', [LaboratoriumController::class, 'reserveByRoom'])->name('laboratorium.reserves');
+    Route::post('laboratorium/reserve', [LaboratoriumController::class, 'labReserve'])->name('laboratorium.reserve');
+
+    // Inventory route
+    Route::get('inventory', [InventoryReserfController::class, 'index'])->name('inventory');
+    Route::get('inventory/reserve', [InventoryReserfController::class, 'getReserve'])->name('inventory.reserves');
+    Route::post('inventory/reserve', [InventoryReserfController::class, 'inventoryReserve'])->name('inventory.reserve');
 });

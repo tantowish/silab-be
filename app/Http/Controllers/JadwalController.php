@@ -16,7 +16,7 @@ class JadwalController extends Controller
         ]);
     }
 
-    public function getSchedulelDetail($id){
+    public function getScheduleByRoom($id){
         $jadwal = Room::with('schedules')->find($id);
  
         if(!$jadwal){
