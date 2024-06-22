@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('role',['admin', 'dosen', 'mahasiswa', 'mahasiswa_ta', 'kaleb']);
             $table->enum('login_status',['on', 'off'])->default('off');
             $table->timestamp('last_login')->nullable();
+            $table->string('photo')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

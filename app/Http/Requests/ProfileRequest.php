@@ -28,6 +28,7 @@ class ProfileRequest extends FormRequest
             'username' => 'sometimes|min:1|max:255',
             'first_name' => 'sometimes|min:1|max:255',
             'last_name' => 'sometimes|min:1|max:255',
+            'photo' => 'sometimes|min:1',
         ];
     }
 }

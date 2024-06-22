@@ -81,11 +81,22 @@ class AuthController extends Controller
             return response()->json(['message' => "Email belum terverifikasi"]);
         }
 
+        // Create full photo URL
+        $photoUrl = $user->photo ? asset('storage/post_img/' . $user->photo) : asset('asset/profile.webp');
+
         // Response, create token
         return response()->json([
             'message' => 'Berhasil login',
             'token' => $user->createToken('user_login')->plainTextToken,
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'role' => $user->role,
+                'photo_url' => $photoUrl,  // Add photo URL to response
+            ],
         ]);
     }
 
@@ -106,13 +117,18 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $validatedData = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $filename = $request->file('photo')->getClientOriginalName(); // get the file name
+            $getfilenamewitoutext = pathinfo($filename, PATHINFO_FILENAME); // get the file name without extension
+            $getfileExtension = $request->file('photo')->getClientOriginalExtension(); // get the file extension
+            $createnewFileName = time() . '_' . str_replace(' ', '_', $getfilenamewitoutext) . '.' . $getfileExtension; // create new random file name
+            $img_path = $request->file('photo')->storeAs('public/post_img', $createnewFileName); // get the image path
+            $validatedData['photo'] = $createnewFileName; // add photo to validated data
+        }
+
         $user->update($validatedData);
-        $user = $user->refresh();
 
-        $success['user'] = $user;
-        $success['success'] = true;
-
-        return response()->json($success, 200);
+        return response()->json(['status' => true, 'message' => "User updated successfully", 'user' => $user], 200);
     }
-    
 }
