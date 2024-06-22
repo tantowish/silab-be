@@ -36,6 +36,15 @@ class ContentController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'students.id_user')
                 ->groupBy(
                     'contents.id',
+                    'contents.id_proyek',
+                    'contents.thumbnail_image_url',
+                    'contents.content_url',
+                    'contents.video_url',
+                    'contents.video_tittle',
+                    'contents.github_url',
+                    'contents.tipe_konten',
+                    'contents.created_at',
+                    'contents.updated_at',
                     'projects.id',
                     'users.id',
                     'projects.id_lecturer',
