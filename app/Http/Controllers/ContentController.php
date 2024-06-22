@@ -51,7 +51,7 @@ class ContentController extends Controller
         } else {
             $tags = $request['category'];
             $category = Tag::where('tag', $tags)->pluck('id_content');
-            
+
             $contents = Content::select(
                 'contents.*',
                 'users.first_name',
@@ -73,15 +73,16 @@ class ContentController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'students.id_user')
                 ->groupBy(
                     'contents.id',
+                    'users.first_name',
+                    'users.last_name',
                     'projects.id',
-                    'users.id',
                     'projects.id_lecturer',
                     'projects.id_period',
                     'projects.tittle',
                     'projects.agency',
                     'projects.description',
                     'projects.tools',
-                    'projects.status'
+                    'projects.status',
                 )
                 ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
                 ->paginate(9);
@@ -102,7 +103,7 @@ class ContentController extends Controller
             ->whereIn('contents.id', $contents)
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
+            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
 
@@ -122,7 +123,7 @@ class ContentController extends Controller
             ->whereIn('contents.id', $contents)
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
+            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
@@ -136,7 +137,7 @@ class ContentController extends Controller
         $sorted_contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id')
+            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
@@ -184,16 +185,17 @@ class ContentController extends Controller
             ->leftJoin('users', 'users.id', '=', 'students.id_user')
             ->groupBy(
                 'contents.id',
+                'users.first_name',
+                'users.last_name',
+                'lecturers.full_name',
                 'projects.id',
-                'users.id',
-                'lecturers.id',
                 'projects.id_lecturer',
                 'projects.id_period',
                 'projects.tittle',
                 'projects.agency',
                 'projects.description',
                 'projects.tools',
-                'projects.status'
+                'projects.status',
             )
             ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
             ->get();
@@ -225,15 +227,16 @@ class ContentController extends Controller
             ->leftJoin('users', 'users.id', '=', 'students.id_user')
             ->groupBy(
                 'contents.id',
+                'users.first_name',
+                'users.last_name',
                 'projects.id',
-                'users.id',
                 'projects.id_lecturer',
                 'projects.id_period',
                 'projects.tittle',
                 'projects.agency',
                 'projects.description',
                 'projects.tools',
-                'projects.status'
+                'projects.status',
             )
             ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
             ->get();
