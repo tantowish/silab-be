@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Content;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +57,7 @@ class ContentController extends Controller
                     'projects.tools',
                     'projects.status'
                 )
-                ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+                ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
                 ->paginate(9);
         } else {
             $tags = $request['category'];
@@ -156,22 +157,76 @@ class ContentController extends Controller
 
     public function store(Request $request)
     {
+        $id = Auth::user()->id;
         $request->validate([
             'thumbnail_image_url' => 'required',
             'content_url' => 'required',
             'video_url' => 'required',
             'video_tittle' => 'required',
-            'github_url' => 'required',
             'tipe_konten' => 'required',
         ]);
 
-        $id_proyek = $request->id_proyek;
-        $content = Content::create($request->all());
-        return response()->json("Content berhasil ditambahkan");
+
+
+        $project = Project::select('projects.id')
+            ->leftJoin('bimbingan', 'projects.id', '=', 'bimbingan.id_project')
+            ->leftJoin('lecturers', 'lecturers.id', '=', 'bimbingan.id_lecturer')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->where('users.id', $id)->get();
+
+
+
+        if ($request->hasFile('thumbnail_image_url')) {
+            $thumbnailPath = $request->file('thumbnail_image_url')->store('thumbnails', 'public');
+        }
+
+        // Simpan PDF file
+        if ($request->hasFile('content_url')) {
+            $contentPath = $request->file('content_url')->store('pdfs', 'public');
+        }
+
+
+        $content = new Content();
+        $content->id_proyek = $project[0]->id;
+        $content->thumbnail_image_url = $thumbnailPath;
+        $content->content_url = $contentPath;
+        $content->video_url = $request->video_url;
+        $content->video_tittle = $request->video_tittle;
+        $content->github_url = $request->github_url;
+        $content->tipe_konten = $request->tipe_konten;
+        $content->save();
+
+        $tags = $request->input('tags');
+
+        $tags = explode(',', $tags);
+
+        foreach ($tags as $tagValue) {
+            $tag = new Tag();
+            $tag->tag = $tagValue;
+            $tag->id_content = $content->id; // Mengisi id_content dengan id content yang baru saja disimpan
+            $tag->save();
+        }
+
+        return response()->json(["Content berhasil ditambahkan", $content]);
+    }
+
+    public function showProject()
+    {
+        $id = Auth::user()->id;
+        $project = Project::select('projects.*', 'users.*', 'lecturers.full_name as lecturer')
+            ->leftJoin('bimbingan', 'projects.id', '=', 'bimbingan.id_project')
+            ->leftJoin('lecturers', 'lecturers.id', '=', 'bimbingan.id_lecturer')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->where('users.id', $id)->get();
+
+        return response()->json($project);
     }
 
     public function show($id)
     {
+
         $content = Content::select(
             'contents.*',
             'users.first_name',
@@ -207,19 +262,35 @@ class ContentController extends Controller
                 'projects.tools',
                 'projects.status',
             )
-            ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+            ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
             ->get();
+
+        $thumbnail_image_url = asset('storage/' . $content[0]->thumbnail_image_url);
+        $content[0]->thumbnail_image_url = $thumbnail_image_url;
+        $content_url = asset('storage/' . $content[0]->content_url);
+        $content[0]->content_url = $content_url;
 
         return response()->json($content);
         // return view('content.show');
     }
 
+
+
     public function self($id)
     {
         $content = Content::select(
-            'contents.*',
-            'users.first_name',
-            'users.last_name',
+            'contents.id as content_id',
+            'contents.id_proyek',
+            'contents.thumbnail_image_url',
+            'contents.content_url',
+            'contents.video_url',
+            'contents.video_tittle',
+            'contents.github_url',
+            'contents.tipe_konten',
+            'contents.created_at',
+            'contents.updated_at',
+            'users.*',
+            'lecturers.full_name as lecturer',
             'projects.id as project_id',
             'projects.id_lecturer',
             'projects.id_period',
@@ -229,17 +300,19 @@ class ContentController extends Controller
             'projects.tools',
             'projects.status',
         )
-            ->where('users.id', '=', $id)
+
             ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
             ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+            ->leftJoin('lecturers', 'lecturers.id', '=', 'bimbingan.id_lecturer')
             ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
             ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->where('users.id', '=', $id)
             ->groupBy(
                 'contents.id',
-                'users.first_name',
-                'users.last_name',
+                'users.id',
                 'projects.id',
+                'lecturers.full_name',
                 'projects.id_lecturer',
                 'projects.id_period',
                 'projects.tittle',
@@ -248,29 +321,76 @@ class ContentController extends Controller
                 'projects.tools',
                 'projects.status',
             )
-            ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+            ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
             ->get();
 
+        $thumbnailPath = asset('storage/' . $content[0]->thumbnail_image_url);
+        $contentPath = asset('storage/' . $content[0]->content_url);
+        $content[0]->thumbnail_image_url = $thumbnailPath;
+        $content[0]->content_url = $contentPath;
         return response()->json($content);
         // return view('content.show');
     }
 
 
+
     public function update(Request $request)
     {
-        $request->validate([
-            'id_proyek' => 'required',
-            'thumbnail_image_url' => 'required',
-            'content_url' => 'required',
-            'video_url' => 'required',
-            'video_tittle' => 'required',
-            'github_url' => 'required',
-            'tipe_konten' => 'required',
+        $validatedData = $request->validate([
+            'thumbnail_image_url' => 'nullable',
+            'content_url' => 'nullable',
+            'video_url' => 'nullable',
+            'video_tittle' => 'nullable',
+            'tipe_konten' => 'nullable',
         ]);
-        $id = $request->id_proyek;
-        $content = Content::find($id);
-        $content->update($request->all());
-        return response()->json("Content berhasil di-update");
+
+        $id = Auth::user()->id;
+        $project = Project::select('projects.id')
+            ->leftJoin('bimbingan', 'projects.id', '=', 'bimbingan.id_project')
+            ->leftJoin('lecturers', 'lecturers.id', '=', 'bimbingan.id_lecturer')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
+            ->where('users.id', $id)->get()->first();
+
+
+        if ($request->hasFile('thumbnail_image_url')) {
+            $thumbnailPath = $request->file('thumbnail_image_url')->store('thumbnails', 'public');
+            $validatedData['thumbnail_image_url'] = $thumbnailPath;
+        }
+
+        // Simpan PDF file
+        if ($request->hasFile('content_url')) {
+            $contentPath = $request->file('content_url')->store('pdfs', 'public');
+            $validatedData['content_url'] = $contentPath;
+        }
+
+        $content = Content::where('id_proyek', $project->id)->first();
+        if ($content) {
+            $content->update($validatedData);
+        } else {
+            return response()->json("Content tidak ditemukan");
+        };
+
+        if($request->has('tags')){
+            $tags = $request->input('tags');
+
+            $tags = explode(',', $tags);
+
+            // Delete old tags associated with this content
+            Tag::where('id_content', $content->id)->delete();
+            foreach ($tags as $tagValue) {
+                $tag = new Tag();
+                $tag->tag = $tagValue;
+                $tag->id_content = $content->id; // Mengisi id_content dengan id content yang baru saja disimpan
+                $tag->save();
+            }
+        }
+
+
+        
+
+        return response()->json(["Content berhasil diupdate", $content]);
+
         // return redirect()->route('content.index');
     }
     public function destroy($id)
@@ -350,8 +470,13 @@ class ContentController extends Controller
     public function countLikes($contentId)
     {
         $content = Content::where('id', $contentId)->first();
-        $count = Like::count($content); // marks the course liked for the given post 
-        return response()->json($count);
+        if (!$content) {
+            $count = 0;
+            return response()->json($count);
+        } else {
+            $count = Like::count($content); // marks the course liked for the given post 
+            return response()->json($count);
+        }
     }
     public function showLiked()
     {

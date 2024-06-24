@@ -119,15 +119,22 @@ class AuthController extends Controller
         $validatedData = $request->validated();
 
         if ($request->hasFile('photo')) {
-            $filename = $request->file('photo')->getClientOriginalName(); // get the file name
-            $getfilenamewitoutext = pathinfo($filename, PATHINFO_FILENAME); // get the file name without extension
-            $getfileExtension = $request->file('photo')->getClientOriginalExtension(); // get the file extension
-            $createnewFileName = time() . '_' . str_replace(' ', '_', $getfilenamewitoutext) . '.' . $getfileExtension; // create new random file name
-            $img_path = $request->file('photo')->storeAs('public/post_img', $createnewFileName); // get the image path
-            $validatedData['photo'] = $createnewFileName; // add photo to validated data
+            $filename = $request->file('photo')->getClientOriginalName();
+            // Mendapatkan nama file tanpa ekstensi
+            $getfilenamewitoutext = pathinfo($filename, PATHINFO_FILENAME);
+            // Mendapatkan ekstensi file
+            $getfileExtension = $request->file('photo')->getClientOriginalExtension();
+            // Membuat nama file baru dengan tanggal dan waktu
+            $createnewFileName = now()->format('Ymd_His') . '_' . str_replace(' ', '_', $getfilenamewitoutext) . '.' . $getfileExtension;
+            // Menyimpan file di direktori yang ditentukan
+            $img_path = $request->file('photo')->storeAs('public/post_img', $createnewFileName);
+            // Menambahkan nama file ke data yang telah divalidasi
+            $validatedData['photo'] = $createnewFileName;
         }
 
         $user->update($validatedData);
+        $photoUrl = $user->photo ? asset('storage/post_img/' . $user->photo) : asset('asset/profile.webp');
+        $user->photo_url = $photoUrl;
 
         return response()->json(['status' => true, 'message' => "User updated successfully", 'user' => $user], 200);
     }

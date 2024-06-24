@@ -98,4 +98,5 @@ Route::middleware(['auth:sanctum', 'role:mahasiswa'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:mahasiswa_ta'])->group(function () {
     Route::post('/add/portofolio', [ContentController::class, 'store']);
     Route::put('/update/portofolio', [ContentController::class, 'update']);
+    Route::get('/project', [ContentController::class, 'showProject']);
     });
