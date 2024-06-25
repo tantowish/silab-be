@@ -84,6 +84,15 @@ class ContentController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'students.id_user')
                 ->groupBy(
                     'contents.id',
+                    'contents.id_proyek',
+                    'contents.thumbnail_image_url',
+                    'contents.content_url',
+                    'contents.video_url',
+                    'contents.video_tittle',
+                    'contents.github_url',
+                    'contents.tipe_konten',
+                    'contents.created_at',
+                    'contents.updated_at',
                     'users.first_name',
                     'users.last_name',
                     'projects.id',
@@ -114,7 +123,26 @@ class ContentController extends Controller
             ->whereIn('contents.id', $contents)
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
+            ->groupBy(
+                'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
 
@@ -134,7 +162,26 @@ class ContentController extends Controller
             ->whereIn('contents.id', $contents)
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
+            ->groupBy(
+                'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
@@ -148,7 +195,26 @@ class ContentController extends Controller
         $sorted_contents = Content::select('contents.*', 'projects.id as project_id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
             ->join('projects', 'contents.id_proyek', '=', 'projects.id')
             ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
-            ->groupBy('contents.id', 'projects.id', 'projects.id_lecturer', 'projects.id_period', 'projects.tittle', 'projects.agency', 'projects.description', 'projects.tools', 'projects.status')
+            ->groupBy(
+                'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->orderBy($based, 'asc')->get();
         // Mengembalikan konten yang telah dipilih dan diurutkan
@@ -250,6 +316,15 @@ class ContentController extends Controller
             ->leftJoin('users', 'users.id', '=', 'students.id_user')
             ->groupBy(
                 'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
                 'users.first_name',
                 'users.last_name',
                 'lecturers.full_name',
@@ -310,6 +385,15 @@ class ContentController extends Controller
             ->where('users.id', '=', $id)
             ->groupBy(
                 'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
                 'users.id',
                 'projects.id',
                 'lecturers.full_name',
@@ -371,7 +455,7 @@ class ContentController extends Controller
             return response()->json("Content tidak ditemukan");
         };
 
-        if($request->has('tags')){
+        if ($request->has('tags')) {
             $tags = $request->input('tags');
 
             $tags = explode(',', $tags);
@@ -387,7 +471,7 @@ class ContentController extends Controller
         }
 
 
-        
+
 
         return response()->json(["Content berhasil diupdate", $content]);
 
@@ -422,6 +506,15 @@ class ContentController extends Controller
             ->where('projects.tittle', 'like', "%" . $query . "%")
             ->groupBy(
                 'contents.id',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
                 'projects.id',
                 'projects.id_lecturer',
                 'projects.id_period',
@@ -487,17 +580,27 @@ class ContentController extends Controller
 
         return response()->json($likedContents);
     }
-    public function createComment($contentId, Request $request)
+    public function createComment(Request $request, $contentId)
     {
         $comment = $request->comment;
         $content = Content::where('id', $contentId)->first();
         $content->comment($comment);
+
+        return response()->json($content);
     }
     public function showComments($contentId)
     {
         // $content = DB::select('SELECT content, user_id FROM comments where commentable_id ='.$contentId);
-        $content = Comment::where('commentable_id', $contentId)->get();
-        return response()->json($content);
+        $contents = Comment::select('comments.*', 'users.first_name', 'users.last_name', 'users.photo')
+            ->where('comments.commentable_id', '=', $contentId)
+            ->leftJoin('users', 'comments.user_id', '=', 'users.id')
+            ->get();
+
+        foreach ($contents as $content) {
+            $content->photo = asset('storage/post_img/' . $content->photo);
+        }
+
+        return response()->json($contents);
     }
     public function showCommentsUser()
     {

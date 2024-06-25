@@ -17,7 +17,7 @@ class LecturerController extends Controller
         $lecturers = Lecturer::select('lecturers.*', 'specialities.tag')
             ->leftJoin('specialities', 'lecturers.id', '=', 'specialities.id_lecturer')
             ->where('lecturers.full_name', 'like', "%" . $query . "%")
-            ->groupBy('lecturers.id', 'lecturers.full_name')
+            ->groupBy('lecturers.id', 'lecturers.full_name', 'lecturers.id_user', 'lecturers.image_profile', 'lecturers.front_title', 'lecturers.back_title', 'lecturers.NID', 'lecturers.phone_number', 'lecturers.max_quota', 'lecturers.isKaprodi', 'lecturers.created_at', 'lecturers.updated_at', 'specialities.tag')
             ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT specialities.tag ORDER BY specialities.tag ASC SEPARATOR \',\')) as specialities')
             ->paginate(5);
 
@@ -49,7 +49,7 @@ class LecturerController extends Controller
             ->leftJoin('specialities', 'lecturers.id', '=', 'specialities.id_lecturer')
             ->where('lecturers.full_name', 'like', "%" . $query . "%")
             ->groupBy('lecturers.id', 'lecturers.full_name')
-            ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT specialities.tag ORDER BY specialities.tag ASC SEPARATOR \',\'), \']\') as specialities')
+            ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT specialities.tag ORDER BY specialities.tag ASC SEPARATOR \',\')) as specialities')
             ->get();
 
         return response()->json($lecturers);
@@ -65,7 +65,7 @@ class LecturerController extends Controller
             ->selectRaw('lecturers.*, CONCAT(GROUP_CONCAT(DISTINCT specialities.tag ORDER BY specialities.tag ASC SEPARATOR \',\')) as specialities')
             ->first();
 
-       $contents = Content::select(
+        $contents = Content::select(
             'contents.*',
             'users.first_name',
             'users.last_name',
