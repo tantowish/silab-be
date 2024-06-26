@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('room_reserves', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('room_id');
+            $table->unsignedBigInteger('room_id')->nullable();
             $table->foreign('room_id')->references('id')->on('rooms');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
-            $table->string('identity', 100);
-            $table->string('email', 255);
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('end_time')->nullable();
+            $table->string('identity', 100)->nullable();
+            $table->string('email', 255)->nullable();
             $table->boolean('is_approved')->default(false);
-            $table->string('no_wa', 50);    
-            $table->text('needs');    
+            $table->string('no_wa', 50)->nullable();    
+            $table->text('needs')->nullable();    
             $table->timestamps();
         });
     }

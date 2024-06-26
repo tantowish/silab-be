@@ -67,6 +67,7 @@ class LaboratoriumController extends Controller
             'no_wa' => 'required|string|max:50',
             'needs' => 'required|string',
         ]);
+        // return $validatedData;
 
         $room = Room::find($validatedData['room_id']);
         if(!$room){
@@ -76,7 +77,7 @@ class LaboratoriumController extends Controller
         $labReserve = RoomReserf::create($validatedData);
         $kalab = User::where('role', 'kaleb')->first();
 
-        Mail::to($kalab->email)->send(new LabReservationConfirmation($labReserve, Auth::user()));
+        // Mail::to($kalab->email)->send(new LabReservationConfirmation($labReserve, Auth::user()));
 
         return response()->json([
             "message"=> "Berhasil membuat reservasi laboratorium",

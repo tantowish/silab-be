@@ -34,6 +34,8 @@ Route::get('/', function(){
 // Routes tanpa middleware
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('landingpage', [LandingpageController::class, 'index'])->name('landingpage');
+
 
 // Routes 'auth:sanctum' middleware
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -52,12 +54,7 @@ Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
     Route::apiResource('subjects', SubjectController::class);
     Route::apiResource('rules', ReserveRuleController::class);
 
-    // Dashboard route
-    Route::get('dashboard/countLab', [DashboardController::class, 'countLab'])->name('dashboard.count-lab');
-    Route::get('dashboard/countInventory', [DashboardController::class, 'countInvent'])->name('dashboard.count-inventory');
-    Route::get('dashboard/schedules', [DashboardController::class, 'getSchedule'])->name('dashboard.schedules');
-    Route::get('dashboard/labReserve', [DashboardController::class, 'getLabReserve'])->name('dashboard.labReserve');
-    Route::get('dashboard/inventoryReserve', [DashboardController::class, 'getInventoryReserve'])->name('dashboard.inventoryReserve');
+   
 
     // Schedule route
     Route::get('schedules', [JadwalController::class, 'getSchedule'])->name('schedule');
@@ -71,7 +68,12 @@ Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    // Profile route
+     // Dashboard route
+     Route::get('dashboard/countLab', [DashboardController::class, 'countLab'])->name('dashboard.count-lab');
+     Route::get('dashboard/countInventory', [DashboardController::class, 'countInvent'])->name('dashboard.count-inventory');
+     Route::get('dashboard/schedules', [DashboardController::class, 'getSchedule'])->name('dashboard.schedules');
+     Route::get('dashboard/labReserve', [DashboardController::class, 'getLabReserve'])->name('dashboard.labReserve');
+     Route::get('dashboard/inventoryReserve', [DashboardController::class, 'getInventoryReserve'])->name('dashboard.inventoryReserve');// Profile route
     Route::get('users', [ProfileController::class, 'getProfile'])->name('users.profile');
     Route::patch('users', [ProfileController::class, 'update'])->name('users.update');
     
@@ -88,5 +90,4 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('inventory/reserve', [InventoryReserfController::class, 'inventoryReserve'])->name('inventory.reserve');
 
     // Landing page
-    Route::get('landingpage', [LandingpageController::class, 'index'])->name('landingpage');
 });

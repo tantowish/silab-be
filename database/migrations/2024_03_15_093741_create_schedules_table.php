@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreign('room_id')->references('id')->on('rooms');
             $table->unsignedBigInteger('subject_id');
             $table->foreign('subject_id')->references('id')->on('subjects');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
+            $table->timestamp('start_time')->nullable();
+            $table->timestamp('end_time')->nullable();
             $table->string('dosen', 255);
             $table->text('information');
             $table->timestamps();
