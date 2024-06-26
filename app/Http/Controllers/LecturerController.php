@@ -61,7 +61,7 @@ class LecturerController extends Controller
         $lecturer = Lecturer::select('lecturers.*')
             ->leftJoin('specialities', 'lecturers.id', '=', 'specialities.id_lecturer')
             ->where('lecturers.id', $id)
-            ->groupBy('lecturers.id')
+            ->groupBy('lecturers.id', 'lecturers.full_name', 'lecturers.id_user', 'lecturers.image_profile', 'lecturers.front_title', 'lecturers.back_title', 'lecturers.NID', 'lecturers.phone_number', 'lecturers.max_quota', 'lecturers.isKaprodi', 'lecturers.created_at', 'lecturers.updated_at')
             ->selectRaw('lecturers.*, CONCAT(GROUP_CONCAT(DISTINCT specialities.tag ORDER BY specialities.tag ASC SEPARATOR \',\')) as specialities')
             ->first();
 
