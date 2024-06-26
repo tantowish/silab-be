@@ -39,9 +39,12 @@ class InventoryController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        return response()->json(["data" => Inventory::findOrFail($id)->with('rooms')->get()]);
-    }
+    {   
+        $inventory = Inventory::find($id);
+        if(!$inventory){
+            return response()->json(["message"=> "Inventaris tidak ditemukan"]);
+        }
+        return response()->json(["data"=>$inventory]);    }
 
     /**
      * Update the specified resource in storage.
