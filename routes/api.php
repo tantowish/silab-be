@@ -53,16 +53,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Routes 'auth:sanctum' dan 'verified' middleware
 Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
-    Route::get('/current', [AuthController::class, 'current']);
-
-    Route::apiResource('rooms', RoomController::class);
-    Route::apiResource('inventories', InventoryController::class);
-    Route::apiResource('subjects', SubjectController::class);
-
-    // Schedule route
-    Route::get('schedules', [JadwalController::class, 'getSchedule'])->name('schedule');
-    Route::get('schedules/{id}', [JadwalController::class, 'getScheduleByRoom'])->name('schedule.detail');
-
     // Reserve route
     Route::get('reserve/laboratorium', [PeminjamanController::class, 'getLabReserve'])->name('reserve.laboratorium');
     Route::patch('reserve/laboratorium/{id}', [PeminjamanController::class, 'changeStatusRoom'])->name('reserve.lab.update');
@@ -71,6 +61,8 @@ Route::middleware(['auth:sanctum', 'verified', 'kaleb'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/current', [AuthController::class, 'current']);
+
     // Dashboard route
     Route::get('dashboard/countLab', [DashboardController::class, 'countLab'])->name('dashboard.count-lab');
     Route::get('dashboard/countInventory', [DashboardController::class, 'countInvent'])->name('dashboard.count-inventory');
@@ -89,4 +81,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('inventory', [InventoryReserfController::class, 'index'])->name('inventory');
     Route::get('inventory/reserve', [InventoryReserfController::class, 'getReserve'])->name('inventory.reserves');
     Route::post('inventory/reserve', [InventoryReserfController::class, 'inventoryReserve'])->name('inventory.reserve');
+});
+
+Route::middleware(['auth:sanctum', 'verified', 'admin'])->group(function () {
+    // Manajemen CRUD
+    Route::apiResource('rooms', RoomController::class);
+    Route::apiResource('inventories', InventoryController::class);
+    Route::apiResource('subjects', SubjectController::class);
+
+    // Schedule route
+    Route::get('schedules', [JadwalController::class, 'getSchedule'])->name('schedule');
+    Route::get('schedules/{id}', [JadwalController::class, 'getScheduleByRoom'])->name('schedule.detail');
 });
