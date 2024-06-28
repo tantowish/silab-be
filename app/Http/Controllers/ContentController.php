@@ -114,7 +114,7 @@ class ContentController extends Controller
             $content->thumbnail_image_url = $thumbnail_image_url;
             $content->content_url = $content_url;
         }
-        
+
         return response()->json($contents);
     }
 
@@ -153,14 +153,14 @@ class ContentController extends Controller
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
 
-            foreach ($get_contents as $content) {
-                $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
-                $content_url = asset('storage/' . $content->content_url);
-                $content->thumbnail_image_url = $thumbnail_image_url;
-                $content->content_url = $content_url;
-            }   
+        foreach ($get_contents as $content) {
+            $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
+            $content_url = asset('storage/' . $content->content_url);
+            $content->thumbnail_image_url = $thumbnail_image_url;
+            $content->content_url = $content_url;
+        }
 
-        
+
 
         // Mengembalikan konten yang telah dipilih beserta data proyek yang terkait dan diurutkan berdasarkan kolom yang dipilih
         return response()->json($get_contents);
@@ -605,10 +605,58 @@ class ContentController extends Controller
     }
     public function showLiked()
     {
-        $likedContents = Content::select('contents.*')
+        $likedContents = Content::select(
+            'contents.*',
+            'users.first_name',
+            'users.last_name',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+        )
+            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
             ->join('markable_likes', 'contents.id', '=', 'markable_likes.markable_id')
             ->where('markable_likes.user_id', Auth::user()->id)
-            ->get();
+            ->groupBy(
+                'contents.id',
+                'users.first_name',
+                'users.last_name',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
+            ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
+            ->paginate(9);
+
+        foreach ($likedContents as $content) {
+            $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
+            $content_url = asset('storage/' . $content->content_url);
+            $content->thumbnail_image_url = $thumbnail_image_url;
+            $content->content_url = $content_url;
+        }
+
 
         return response()->json($likedContents);
     }
@@ -637,10 +685,58 @@ class ContentController extends Controller
     public function showCommentsUser()
     {
         $id = Auth::user()->id;
-        $content = Content::select('contents.*')
+        $commentcontent = Content::select(
+            'contents.*',
+            'users.first_name',
+            'users.last_name',
+            'projects.id as project_id',
+            'projects.id_lecturer',
+            'projects.id_period',
+            'projects.tittle',
+            'projects.agency',
+            'projects.description',
+            'projects.tools',
+            'projects.status',
+        )
+            ->leftJoin('projects', 'contents.id_proyek', '=', 'projects.id')
+            ->leftJoin('tags', 'contents.id', '=', 'tags.id_content')
+            ->leftJoin('bimbingan', 'contents.id_proyek', '=', 'bimbingan.id_project')
+            ->leftJoin('students', 'bimbingan.id_student', '=', 'students.id')
+            ->leftJoin('users', 'users.id', '=', 'students.id_user')
             ->join('comments', 'contents.id', '=', 'comments.commentable_id')
             ->where('comments.user_id', $id)
-            ->get();
-        return response()->json($content);
+            ->groupBy(
+                'contents.id',
+                'users.first_name',
+                'users.last_name',
+                'contents.id_proyek',
+                'contents.thumbnail_image_url',
+                'contents.content_url',
+                'contents.video_url',
+                'contents.video_tittle',
+                'contents.github_url',
+                'contents.tipe_konten',
+                'contents.created_at',
+                'contents.updated_at',
+                'projects.id',
+                'projects.id_lecturer',
+                'projects.id_period',
+                'projects.tittle',
+                'projects.agency',
+                'projects.description',
+                'projects.tools',
+                'projects.status'
+            )
+            ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
+            ->paginate(9);
+
+        foreach ($commentcontent as $content) {
+            $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
+            $content_url = asset('storage/' . $content->content_url);
+            $content->thumbnail_image_url = $thumbnail_image_url;
+            $content->content_url = $content_url;
+        }
+
+        return response()->json($commentcontent);
     }
 }
