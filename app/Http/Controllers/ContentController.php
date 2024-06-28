@@ -104,10 +104,17 @@ class ContentController extends Controller
                     'projects.tools',
                     'projects.status',
                 )
-                ->selectRaw('CONCAT(\'[\', GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\'), \']\') as tags')
+                ->selectRaw('CONCAT(GROUP_CONCAT(DISTINCT tags.tag ORDER BY tags.tag ASC SEPARATOR \',\')) as tags')
                 ->paginate(9);
         }
 
+        foreach ($contents as $content) {
+            $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
+            $content_url = asset('storage/' . $content->content_url);
+            $content->thumbnail_image_url = $thumbnail_image_url;
+            $content->content_url = $content_url;
+        }
+        
         return response()->json($contents);
     }
 
@@ -146,7 +153,14 @@ class ContentController extends Controller
             ->selectRaw('contents.*, projects.id as project_id, projects.id_lecturer, projects.id_period, projects.tittle, projects.agency, projects.description, projects.tools, projects.status, JSON_ARRAYAGG(tags.tag) as tags')
             ->get();
 
+            foreach ($get_contents as $content) {
+                $thumbnail_image_url = asset('storage/' . $content->thumbnail_image_url);
+                $content_url = asset('storage/' . $content->content_url);
+                $content->thumbnail_image_url = $thumbnail_image_url;
+                $content->content_url = $content_url;
+            }   
 
+        
 
         // Mengembalikan konten yang telah dipilih beserta data proyek yang terkait dan diurutkan berdasarkan kolom yang dipilih
         return response()->json($get_contents);
@@ -550,6 +564,8 @@ class ContentController extends Controller
         $id = Auth::user()->id;
         $user = User::find($id);
         Like::add($content, $user); // marks the course liked for the given user
+
+        return response()->json("Content berhasil dilike");
     }
 
     public function unLike($contentId)
@@ -558,6 +574,8 @@ class ContentController extends Controller
         $id = Auth::user()->id;
         $user = User::find($id);
         Like::remove($content, $user); // marks the course liked for the given user
+
+        return response()->json("Content berhasil diunlike");
     }
     public function toggleLike($contentId)
     {
