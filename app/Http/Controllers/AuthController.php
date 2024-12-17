@@ -13,8 +13,16 @@ class AuthController extends Controller
     public function register(Request $request){
         // Validasi input
         $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'username' => 'required|min:1|max:255',
+            'email' => [
+                'required',
+                'email',
+                'unique:users,email',
+                function ($attribute, $value, $fail) {
+                    if (!str_ends_with($value, '@mail.ugm.ac.id')) {
+                        $fail('Email harus menggunakan domain @mail.ugm.ac.id.');
+                    }
+                },
+            ],            'username' => 'required|min:1|max:255',
             'first_name' => 'required|min:1|max:255',
             'last_name' => 'required|min:1|max:255',
             'role' => 'required',
@@ -42,7 +50,15 @@ class AuthController extends Controller
     
     public function login(Request $request){
         $request->validate([
-            'email' => 'required|email',
+            'email' => [
+                'required',
+                'email',
+                function ($attribute, $value, $fail) {
+                    if (!str_ends_with($value, '@mail.ugm.ac.id')) {
+                        $fail('Email harus menggunakan domain @mail.ugm.ac.id.');
+                    }
+                },
+            ],
             'password' => 'required',
         ]);
      
