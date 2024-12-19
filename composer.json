@@ -8,16 +8,22 @@
         "php": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
+        "laravel/jetstream": "^4.3",
         "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.8"
+        "laravel/tinker": "^2.8",
+        "maize-tech/laravel-markable": "^2.2",
+        "overtrue/laravel-follow": "^5.2",
+        "ryangjchandler/laravel-comments": "^0.2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
+        "kitloong/laravel-migrations-generator": "^7.0",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "^10.1",
+        "reliese/laravel": "^1.2",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
